@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 45, 38, 30;
+  --background-start-rgb: 250, 245, 235;
+  --background-end-rgb: 235, 221, 195;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Native-feeling mobile touch interactions */
+* {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Allow text selection inside modals / notes */
+p, span, h1, h2, h3 {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Warm golden selection highlight */
+::selection {
+  background-color: #FDE047;
+  color: #451A03;
+}
+
+/* Triangular shape utility for origami / cat ears */
+.clip-triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
