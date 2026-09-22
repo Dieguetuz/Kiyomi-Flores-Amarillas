@@ -22,7 +22,8 @@ export const PostcardModal: React.FC<PostcardModalProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [dataUrl, setDataUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [sharedSuccess, setSharedSuccess] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -53,7 +54,7 @@ export const PostcardModal: React.FC<PostcardModalProps> = ({
       ctx.lineWidth = 1;
       ctx.strokeRect(44, 44, width - 88, height - 88);
 
-      // Clean Header Left (No stamp, no extra date subtitle)
+      // Clean Header Left
       ctx.fillStyle = '#735B3B';
       ctx.font = 'italic 22px Georgia, serif';
       ctx.textAlign = 'left';
@@ -146,39 +147,106 @@ export const PostcardModal: React.FC<PostcardModalProps> = ({
     img.onerror = () => renderCanvas();
   }, [recipientName, senderName, dateText, dedicationText]);
 
-  const handleDownload = () => {
-    sounds.vibrate(20);
-    sounds.playSecretFound();
-    if (!dataUrl) return;
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = `flores-amarillas-${recipientName.toLowerCase()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const getCanvasBlob = async (): Promise<Blob | null> => {
+    if (!canvasRef.current) return null;
+    return new Promise((resolve) => {
+      canvasRef.current?.toBlob((b) => resolve(b), 'image/png');
+    });
   };
 
-  const handleCopyOrShare = async () => {
+  const handleDownload = async () => {
     sounds.vibrate(20);
-    if (navigator.share && dataUrl) {
+    sounds.playSecretFound();
+
+    const fileName = `flores-amarillas-${recipientName.toLowerCase()}.png`;
+    const blob = await getCanvasBlob();
+
+    // 1. Mobile First: Web Share API (native sheet with "Guardar imagen / Guardar en Fotos" on iOS & Android)
+    if (blob && typeof navigator !== 'undefined' && navigator.share && navigator.canShare) {
       try {
-        const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], `flores-amarillas-${recipientName.toLowerCase()}.png`, {
-          type: 'image/png',
-        });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        const file = new File([blob], fileName, { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
           await navigator.share({
             title: `Flores amarillas para ${recipientName}`,
-            text: 'Un pequeño jardín amarillo que florece para ti.',
+            text: 'Un pequeño jardín amarillo que florece para ti 💛',
             files: [file],
           });
+          setDownloadSuccess(true);
+          setTimeout(() => setDownloadSuccess(false), 2500);
           return;
         }
+      } catch (err: any) {
+        if (err?.name === 'AbortError') return;
+      }
+    }
+
+    // 2. Fallback: Direct Blob URL download
+    if (blob) {
+      try {
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => {
+          URL.revokeObjectURL(blobUrl);
+        }, 5000);
+
+        setDownloadSuccess(true);
+        setTimeout(() => setDownloadSuccess(false), 2500);
+        return;
       } catch {}
     }
+
+    // 3. Fallback: Base64 dataUrl download or window open
+    if (dataUrl) {
+      try {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setDownloadSuccess(true);
+        setTimeout(() => setDownloadSuccess(false), 2500);
+      } catch {
+        window.open(dataUrl, '_blank');
+      }
+    }
+  };
+
+  const handleShare = async () => {
+    sounds.vibrate(20);
+    const fileName = `flores-amarillas-${recipientName.toLowerCase()}.png`;
+    const blob = await getCanvasBlob();
+
+    if (blob && typeof navigator !== 'undefined' && navigator.share && navigator.canShare) {
+      try {
+        const file = new File([blob], fileName, { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: `Flores amarillas para ${recipientName}`,
+            text: 'Un pequeño jardín amarillo que florece para ti 💛',
+            files: [file],
+          });
+          setSharedSuccess(true);
+          setTimeout(() => setSharedSuccess(false), 2000);
+          return;
+        }
+      } catch (err: any) {
+        if (err?.name === 'AbortError') return;
+      }
+    }
+
+    // Fallback: download if share is not available
     handleDownload();
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setSharedSuccess(true);
+    setTimeout(() => setSharedSuccess(false), 2000);
   };
 
   return (
@@ -210,36 +278,45 @@ export const PostcardModal: React.FC<PostcardModalProps> = ({
 
         <canvas ref={canvasRef} className="hidden" />
 
+        {/* Postcard preview image with native long-press touch-to-save enabled */}
         {dataUrl && (
           <div className="relative my-2 w-full overflow-hidden rounded-2xl border-2 border-[#D9C4A1] shadow-md bg-[#FAF3E3]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={dataUrl}
               alt={`Postal para ${recipientName}`}
-              className="h-auto w-full object-contain"
+              className="h-auto w-full object-contain allow-touch-save cursor-pointer select-auto"
+              style={{
+                WebkitTouchCallout: 'default',
+                userSelect: 'auto',
+              }}
             />
           </div>
         )}
 
-        <p className="font-handwriting text-sm text-amber-900/80 text-center my-1 font-medium">
+        <p className="font-handwriting text-sm text-amber-900/80 text-center my-0.5 font-medium">
           Guarda esta postal en tu galería 💛
         </p>
 
-        <div className="mt-2 flex w-full gap-2 sm:gap-3">
+        <p className="font-handwriting text-[11px] text-amber-800/60 text-center mb-2">
+          (En celular también puedes mantener presionada la imagen para guardarla 📱✨)
+        </p>
+
+        <div className="mt-1 flex w-full gap-2 sm:gap-3">
           <button
             onClick={handleDownload}
             className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-800 py-3 px-3 font-serif text-xs font-medium text-amber-50 shadow hover:bg-amber-900 transition-colors active:scale-95"
           >
-            <Download size={14} />
-            <span>Descargar</span>
+            {downloadSuccess ? <Check size={14} className="text-emerald-300" /> : <Download size={14} />}
+            <span>{downloadSuccess ? '¡Guardada!' : 'Descargar'}</span>
           </button>
 
           <button
-            onClick={handleCopyOrShare}
+            onClick={handleShare}
             className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-100 py-3 px-4 font-serif text-xs font-medium text-amber-900 hover:bg-amber-200 transition-colors active:scale-95"
           >
-            {copied ? <Check size={14} className="text-emerald-700" /> : <Share2 size={14} />}
-            <span>{copied ? '¡Listo!' : 'Compartir'}</span>
+            {sharedSuccess ? <Check size={14} className="text-emerald-700" /> : <Share2 size={14} />}
+            <span>{sharedSuccess ? '¡Listo!' : 'Compartir'}</span>
           </button>
         </div>
       </motion.div>

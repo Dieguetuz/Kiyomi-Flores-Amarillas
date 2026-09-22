@@ -33,6 +33,14 @@ p, span, h1, h2, h3 {
   -webkit-user-select: text;
 }
 
+/* Allow mobile long-press to save image in gallery */
+img.allow-touch-save {
+  -webkit-touch-callout: default !important;
+  user-select: auto !important;
+  -webkit-user-select: auto !important;
+  pointer-events: auto !important;
+}
+
 /* Warm golden selection highlight */
 ::selection {
   background-color: #FDE047;
