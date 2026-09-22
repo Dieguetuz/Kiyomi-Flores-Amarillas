@@ -40,9 +40,9 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
         sounds.playSecretFound();
         try {
           confetti({
-            particleCount: 35,
+            particleCount: 40,
             spread: 60,
-            origin: { y: 0.7 },
+            origin: { y: 0.65 },
             colors: ['#FBBF24', '#F59E0B', '#FEF08A', '#84936B'],
           });
         } catch {}
@@ -56,19 +56,19 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
   const isAllOpened = openedFlowers.length === flowers.length;
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col justify-between px-4 sm:px-6 pt-16 pb-8 select-none">
-      <div className="mx-auto w-full max-w-lg text-center space-y-2">
+    <div className="relative flex min-h-[100dvh] w-full flex-col justify-between px-3 sm:px-6 pt-12 pb-6 select-none">
+      {/* Chapter Header */}
+      <div className="mx-auto w-full max-w-md text-center space-y-1.5 pt-2">
         <motion.span
-          initial={{ opacity: 0, y: -6 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="font-serif text-xs uppercase tracking-widest text-amber-900/60"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="font-serif text-[11px] uppercase tracking-widest text-amber-900/60 font-semibold"
         >
           {chapterTag}
         </motion.span>
         <motion.h2
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
           className="font-serif text-2xl sm:text-3xl text-charcoal tracking-tight font-medium"
         >
           {title}
@@ -76,8 +76,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="font-handwriting text-lg text-amber-800/80"
+          className="font-handwriting text-base sm:text-lg text-amber-800/85"
         >
           {!isAllOpened
             ? `${instruction} (${openedFlowers.length}/${flowers.length})`
@@ -85,32 +84,34 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
         </motion.p>
       </div>
 
-      <div className="relative mx-auto my-auto w-full max-w-md py-6">
-        <div className="grid grid-cols-3 gap-y-6 gap-x-2 sm:gap-x-4 place-items-center">
+      {/* Flower Field - Perfectly tuned for mobile touch ergonomics */}
+      <div className="relative mx-auto my-auto w-full max-w-sm py-3">
+        <div className="grid grid-cols-3 gap-y-5 gap-x-1 sm:gap-x-3 place-items-center">
           {flowers.map((flower, idx) => {
             const isOpened = openedFlowers.includes(flower.id);
             return (
               <motion.div
                 key={flower.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1, duration: 0.6 }}
-                className="relative flex flex-col items-center group cursor-pointer"
+                transition={{ delay: idx * 0.06, duration: 0.4 }}
+                className="relative flex flex-col items-center group cursor-pointer active:scale-95 transition-transform"
                 onClick={() => handleFlowerTouch(flower, idx)}
               >
+                {/* Number Badge when closed */}
                 {!isOpened && (
                   <motion.div
-                    animate={{ y: [0, -4, 0] }}
-                    transition={{ repeat: Infinity, duration: 2.4, delay: idx * 0.3 }}
-                    className="absolute -top-3 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-amber-100/90 text-amber-800 text-xs font-handwriting shadow-sm border border-amber-300"
+                    animate={{ y: [0, -3, 0] }}
+                    transition={{ repeat: Infinity, duration: 2, delay: idx * 0.2 }}
+                    className="absolute -top-2 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-900 text-[11px] font-handwriting shadow-sm border border-amber-300"
                   >
                     {idx + 1}
                   </motion.div>
                 )}
 
                 <div
-                  className={`transition-transform duration-300 ${
-                    isOpened ? 'scale-100' : 'scale-90 hover:scale-100'
+                  className={`transition-all duration-200 ${
+                    isOpened ? 'scale-100' : 'scale-90 hover:scale-95'
                   }`}
                 >
                   <FlowerSVG
@@ -118,16 +119,16 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
                     isOpen={isOpened}
                     petalColor={flower.petalColor}
                     centerColor={flower.centerColor}
-                    stemHeight={flower.stemHeight}
-                    scale={flower.scale}
+                    stemHeight={78}
+                    scale={0.96}
                     rotation={flower.rotation}
                     showPollen={isOpened}
                   />
                 </div>
 
                 <span
-                  className={`mt-1 font-handwriting text-xs sm:text-sm text-center transition-colors ${
-                    isOpened ? 'text-amber-900 font-medium' : 'text-amber-800/50'
+                  className={`mt-0.5 font-handwriting text-xs sm:text-sm text-center leading-tight transition-colors ${
+                    isOpened ? 'text-amber-950 font-medium' : 'text-amber-800/50'
                   }`}
                 >
                   {isOpened ? flower.shortLabel : 'tocar'}
@@ -138,49 +139,51 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
         </div>
       </div>
 
+      {/* Note modal when a flower is touched */}
       <AnimatePresence>
         {activeNote && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-charcoal-dark/40 px-5 backdrop-blur-[2px]"
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-charcoal-dark/45 px-4 backdrop-blur-[2px]"
             onClick={() => setActiveNote(null)}
           >
             <motion.div
-              initial={{ scale: 0.88, y: 25, opacity: 0 }}
+              initial={{ scale: 0.9, y: 15, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              transition={{ type: 'spring', damping: 22, stiffness: 260 }}
+              exit={{ scale: 0.92, y: 10, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 340 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-sm rounded-2xl bg-[#FCF8EE] p-7 shadow-paper-lg border border-[#E9DFC8] text-center"
+              className="relative w-full max-w-xs sm:max-w-sm rounded-2xl bg-[#FCF8EE] p-6 shadow-2xl border border-[#E9DFC8] text-center"
               style={{
-                boxShadow: '0 16px 40px -10px rgba(78, 54, 25, 0.2), 0 0 0 1px rgba(217, 195, 155, 0.5)',
+                boxShadow: '0 16px 40px -10px rgba(78, 54, 25, 0.22), 0 0 0 1px rgba(217, 195, 155, 0.5)',
               }}
             >
               <button
                 onClick={() => setActiveNote(null)}
                 aria-label="Cerrar nota"
-                className="absolute top-4 right-4 rounded-full p-1 text-amber-900/50 hover:bg-amber-100/60 hover:text-amber-900"
+                className="absolute top-3.5 right-3.5 rounded-full p-1.5 text-amber-900/50 hover:bg-amber-100 hover:text-amber-900"
               >
                 <X size={18} />
               </button>
 
-              <div className="mb-3 flex justify-center text-amber-500">
+              <div className="mb-2 flex justify-center text-amber-500">
                 <Sparkles size={20} />
               </div>
 
-              <span className="font-serif text-xs uppercase tracking-wider text-amber-800/60">
+              <span className="font-serif text-[11px] uppercase tracking-wider text-amber-800/60 font-semibold">
                 Flor #{activeNote.number}
               </span>
 
-              <p className="mt-3 font-handwriting text-2xl sm:text-3xl leading-relaxed text-[#2C2317] font-normal">
+              <p className="mt-2.5 font-handwriting text-2xl sm:text-3xl leading-snug text-[#2C2317] font-normal">
                 {activeNote.note}
               </p>
 
               <button
                 onClick={() => setActiveNote(null)}
-                className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-amber-100/80 px-4 py-1.5 font-serif text-xs font-medium text-amber-900 transition-colors hover:bg-amber-200/80"
+                className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-amber-100/90 px-4 py-2 font-serif text-xs font-medium text-amber-900 transition-colors hover:bg-amber-200 active:scale-95"
               >
                 Guardar en el jardín 💛
               </button>
@@ -189,19 +192,21 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
         )}
       </AnimatePresence>
 
-      <div className="mx-auto w-full max-w-md flex justify-center min-h-[56px] items-center">
+      {/* Button to proceed to Chapter 2 */}
+      <div className="mx-auto w-full max-w-sm flex justify-center min-h-[52px] items-center">
         <AnimatePresence>
           {isAllOpened && (
             <motion.button
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 20 }}
               onClick={() => {
                 sounds.vibrate(20);
                 sounds.playBloom(2);
                 onComplete();
               }}
-              className="group flex items-center gap-3 rounded-full bg-amber-800/90 px-6 py-3 font-serif text-sm font-medium text-amber-50 shadow-md transition-all hover:bg-amber-900 hover:scale-[1.02] active:scale-[0.98]"
+              className="group flex items-center gap-2.5 rounded-full bg-amber-800 px-6 py-3 font-serif text-sm font-medium text-amber-50 shadow-md transition-all hover:bg-amber-900 active:scale-95"
             >
               <span>Explorar los secretos</span>
               <ArrowRight

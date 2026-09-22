@@ -22,8 +22,9 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
   const [isBloomed, setIsBloomed] = useState(false);
 
   useEffect(() => {
-    const timer1 = setTimeout(() => setStage('message'), 1600);
-    const timer2 = setTimeout(() => setStage('ready'), 3400);
+    // Snappy, engaging pacing
+    const timer1 = setTimeout(() => setStage('message'), 600);
+    const timer2 = setTimeout(() => setStage('ready'), 1400);
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
@@ -34,24 +35,24 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
     if (stage === 'blooming' || isBloomed) return;
     setIsBloomed(true);
     setStage('blooming');
-    sounds.vibrate([30, 40, 30]);
+    sounds.vibrate([30, 30]);
     sounds.playBloom(0);
 
     setTimeout(() => {
       onComplete();
-    }, 2200);
+    }, 1100);
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center px-6 py-12 text-center select-none">
-      <div className="max-w-md w-full space-y-8">
+    <div className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 py-8 text-center select-none">
+      <div className="max-w-xs sm:max-w-sm w-full space-y-6">
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          className="space-y-4"
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="space-y-3"
         >
-          <h1 className="font-serif text-3xl sm:text-4xl tracking-wide text-[#FBF5E5] drop-shadow-md">
+          <h1 className="font-serif text-3xl sm:text-4xl tracking-wide text-[#FAF5E8] drop-shadow">
             {salutation}
           </h1>
         </motion.div>
@@ -59,39 +60,39 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
         <AnimatePresence>
           {(stage === 'message' || stage === 'ready' || stage === 'blooming') && (
             <motion.p
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.4, ease: 'easeOut' }}
-              className="font-serif text-lg sm:text-xl text-[#D6C4A5] leading-relaxed italic"
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="font-serif text-base sm:text-lg text-[#D6C4A5] leading-relaxed italic"
             >
               {subtext}
             </motion.p>
           )}
         </AnimatePresence>
 
-        <div className="pt-6 flex flex-col items-center justify-center min-h-[260px]">
+        <div className="pt-4 flex flex-col items-center justify-center min-h-[200px]">
           <AnimatePresence>
             {(stage === 'ready' || stage === 'blooming') && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={{ opacity: 0, scale: 0.85 }}
                 animate={{
                   opacity: 1,
                   scale: stage === 'blooming' ? 1.15 : 1,
                 }}
-                transition={{ duration: 1, type: 'spring' }}
-                className="flex flex-col items-center group cursor-pointer"
+                transition={{ duration: 0.5, type: 'spring' }}
+                className="flex flex-col items-center group cursor-pointer active:scale-95 transition-transform"
                 onClick={handleFlowerClick}
               >
                 {!isBloomed && (
                   <motion.div
-                    className="absolute h-36 w-36 rounded-full border border-yellow-400/20 pointer-events-none"
+                    className="absolute h-32 w-32 rounded-full border border-yellow-400/25 pointer-events-none"
                     animate={{
                       scale: [1, 1.25, 1],
                       opacity: [0.3, 0.7, 0.3],
                     }}
                     transition={{
                       repeat: Infinity,
-                      duration: 3,
+                      duration: 2.2,
                       ease: 'easeInOut',
                     }}
                   />
@@ -103,28 +104,28 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
                     isOpen={isBloomed}
                     petalColor="#FACC15"
                     centerColor="#78350F"
-                    stemHeight={90}
-                    scale={1.2}
+                    stemHeight={80}
+                    scale={1.15}
                     showPollen={isBloomed}
                   />
                 </div>
 
                 {!isBloomed ? (
                   <motion.p
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.8 }}
-                    className="mt-6 font-handwriting text-xl text-yellow-300/90 tracking-wide"
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="mt-4 font-handwriting text-xl text-yellow-300 tracking-wide"
                   >
                     {callToAction}
                   </motion.p>
                 ) : (
                   <motion.p
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mt-6 font-serif text-sm tracking-widest uppercase text-yellow-200/80"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="mt-4 font-serif text-xs tracking-widest uppercase text-yellow-200/90 font-medium"
                   >
-                    Abriendo el jardín...
+                    El jardín está despertando...
                   </motion.p>
                 )}
               </motion.div>

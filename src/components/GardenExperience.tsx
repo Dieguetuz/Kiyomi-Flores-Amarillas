@@ -27,7 +27,6 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
     }
   };
 
-  // Determine current active background theme
   const getActiveTheme = () => {
     if (currentChapter === 0) return 'dark';
     if (customTheme === 'mikey') return 'mikey';
@@ -38,7 +37,6 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
 
   return (
     <PaperBackground theme={getActiveTheme()}>
-      {/* Delicate chapter progress */}
       <ChapterProgress
         currentChapter={currentChapter}
         totalChapters={5}
@@ -46,16 +44,15 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
         onChapterSelect={(ch) => setCurrentChapter(ch)}
       />
 
-      {/* Main Chapter Content Container with Page-turn style transitions */}
-      <main className="relative flex-1 w-full flex flex-col justify-center">
+      <main className="relative flex-1 w-full flex flex-col justify-center overflow-x-hidden">
         <AnimatePresence mode="wait">
           {currentChapter === 0 && (
             <motion.div
               key="chapter-intro"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, scale: 0.98, filter: 'blur(4px)' }}
-              transition={{ duration: 0.9, ease: 'easeInOut' }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.45, ease: 'easeInOut' }}
               className="w-full flex-1 flex flex-col justify-center"
             >
               <IntroScene
@@ -70,10 +67,10 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
           {currentChapter === 1 && (
             <motion.div
               key="chapter-garden"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(3px)' }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
               className="w-full flex-1 flex flex-col justify-center"
             >
               <GardenChapter
@@ -90,10 +87,10 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
           {currentChapter === 2 && (
             <motion.div
               key="chapter-secrets"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(3px)' }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
               className="w-full flex-1 flex flex-col justify-center"
             >
               <SecretsChapter
@@ -110,10 +107,10 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
           {currentChapter === 3 && (
             <motion.div
               key="chapter-minecraft"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(3px)' }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
               className="w-full flex-1 flex flex-col justify-center"
             >
               <MinecraftChapter
@@ -134,7 +131,7 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.9, ease: 'easeOut' }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
               className="w-full flex-1 flex flex-col justify-center"
             >
               <BouquetChapter
