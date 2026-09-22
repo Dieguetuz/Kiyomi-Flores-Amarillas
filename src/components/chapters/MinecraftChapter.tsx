@@ -44,7 +44,6 @@ export const MinecraftChapter: React.FC<MinecraftChapterProps> = ({
         });
       } catch {}
 
-      // Fast, engaging staggered reveal (750ms instead of 1400ms)
       const timer = setInterval(() => {
         setRevealedIndex((prev) => {
           if (prev < messages.length) {
@@ -60,26 +59,26 @@ export const MinecraftChapter: React.FC<MinecraftChapterProps> = ({
 
   return (
     <div className="relative flex min-h-[100dvh] w-full flex-col justify-between px-3 sm:px-6 pt-12 pb-6 select-none">
-      {/* Header */}
-      <div className="mx-auto w-full max-w-md text-center space-y-1 pt-2">
+      {/* Header - Crisp White & Luminous Gold Text for High Contrast */}
+      <div className="mx-auto w-full max-w-md text-center space-y-2 pt-2">
         <motion.span
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="font-serif text-[11px] uppercase tracking-widest text-amber-900/60 font-semibold"
+          className="font-serif text-[12px] uppercase tracking-widest text-yellow-300 font-semibold drop-shadow"
         >
           {chapterTag}
         </motion.span>
         <motion.h2
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="font-serif text-2xl sm:text-3xl text-charcoal tracking-tight font-medium"
+          className="font-serif text-2xl sm:text-3xl text-white tracking-tight font-medium drop-shadow-md"
         >
           {title}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="font-handwriting text-base sm:text-lg text-amber-800/85"
+          className="font-handwriting text-lg sm:text-xl text-[#FEF9C3] drop-shadow-sm"
         >
           {subtitle}
         </motion.p>
@@ -92,8 +91,7 @@ export const MinecraftChapter: React.FC<MinecraftChapterProps> = ({
           onClick={handleBlockClick}
           className="relative cursor-pointer group flex flex-col items-center active:scale-95 transition-transform"
         >
-          {/* Illustrated 3D Voxel Grass Block with Dandelion */}
-          <div className="relative h-44 w-44 sm:h-52 sm:w-52 overflow-hidden rounded-3xl border-2 border-amber-800/20 shadow-xl bg-[#EDE4CF]">
+          <div className="relative h-44 w-44 sm:h-52 sm:w-52 overflow-hidden rounded-3xl border-2 border-yellow-400/40 shadow-2xl bg-[#EDE4CF]">
             <Image
               src="/images/minecraft_block.jpg"
               alt="Bloque de tierra y flor amarilla"
@@ -101,12 +99,11 @@ export const MinecraftChapter: React.FC<MinecraftChapterProps> = ({
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               priority
             />
-            {/* Pulsing ring prompt if not yet tapped */}
             {!isActivated && (
               <motion.div
-                animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.8, 0.3] }}
+                animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.9, 0.3] }}
                 transition={{ repeat: Infinity, duration: 2 }}
-                className="absolute inset-0 rounded-3xl border-2 border-yellow-400/80 pointer-events-none"
+                className="absolute inset-0 rounded-3xl border-2 border-yellow-300 pointer-events-none"
               />
             )}
           </div>
@@ -115,7 +112,7 @@ export const MinecraftChapter: React.FC<MinecraftChapterProps> = ({
             <motion.p
               animate={{ y: [0, 3, 0] }}
               transition={{ repeat: Infinity, duration: 1.8 }}
-              className="mt-3 font-handwriting text-sm text-amber-900 bg-amber-100/90 px-3.5 py-1 rounded-full border border-amber-300 shadow-sm"
+              className="mt-3 font-handwriting text-sm text-yellow-100 bg-black/60 px-4 py-1 rounded-full border border-yellow-400/50 shadow-md backdrop-blur-sm"
             >
               {blockInstruction}
             </motion.p>
@@ -129,10 +126,10 @@ export const MinecraftChapter: React.FC<MinecraftChapterProps> = ({
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="mt-4 w-full rounded-2xl bg-[#FAF4E6] p-4 sm:p-5 border border-[#E5D7BE] shadow-paper text-center space-y-2"
+              className="mt-4 w-full rounded-2xl bg-black/55 backdrop-blur-md p-4 sm:p-5 border border-yellow-400/30 shadow-2xl text-center space-y-2"
             >
-              <span className="inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-lime-900 bg-lime-100/90 px-2.5 py-0.5 rounded-full">
-                <Sparkles size={12} className="text-lime-700" />
+              <span className="inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-lime-300 bg-lime-900/60 border border-lime-400/30 px-2.5 py-0.5 rounded-full">
+                <Sparkles size={12} className="text-lime-300" />
                 {pixelBadge}
               </span>
 
@@ -145,8 +142,8 @@ export const MinecraftChapter: React.FC<MinecraftChapterProps> = ({
                     transition={{ duration: 0.3 }}
                     className={`font-handwriting leading-snug ${
                       idx === 0
-                        ? 'text-2xl text-amber-950 font-medium'
-                        : 'text-lg sm:text-xl text-amber-900/90'
+                        ? 'text-2xl text-yellow-200 font-medium'
+                        : 'text-lg sm:text-xl text-yellow-100'
                     }`}
                   >
                     {msg}
@@ -172,12 +169,12 @@ export const MinecraftChapter: React.FC<MinecraftChapterProps> = ({
                 sounds.playBouquetArrival();
                 onComplete();
               }}
-              className="group flex items-center gap-2.5 rounded-full bg-amber-800 px-6 py-3 font-serif text-sm font-medium text-amber-50 shadow-md transition-all hover:bg-amber-900 active:scale-95"
+              className="group flex items-center gap-2.5 rounded-full bg-amber-600 px-6 py-3 font-serif text-sm font-medium text-white shadow-xl hover:bg-amber-500 active:scale-95 border border-amber-300/40"
             >
               <span>Reunir tus flores</span>
               <ArrowRight
                 size={16}
-                className="transition-transform group-hover:translate-x-1 text-amber-300"
+                className="transition-transform group-hover:translate-x-1 text-yellow-200"
               />
             </motion.button>
           )}

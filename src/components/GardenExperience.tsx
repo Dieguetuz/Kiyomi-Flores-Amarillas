@@ -7,7 +7,6 @@ import { PaperBackground } from '@/components/ui/PaperBackground';
 import { ChapterProgress } from '@/components/ui/ChapterProgress';
 import { IntroScene } from '@/components/chapters/IntroScene';
 import { GardenChapter } from '@/components/chapters/GardenChapter';
-import { SecretsChapter } from '@/components/chapters/SecretsChapter';
 import { MinecraftChapter } from '@/components/chapters/MinecraftChapter';
 import { BouquetChapter } from '@/components/chapters/BouquetChapter';
 
@@ -28,8 +27,8 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
 
   const getActiveTheme = () => {
     if (currentChapter === 0) return 'dark';
-    if (currentChapter === 3) return 'minecraft';
-    if (currentChapter === 4) return 'bouquet';
+    if (currentChapter === 2) return 'minecraft';
+    if (currentChapter === 3) return 'bouquet';
     return 'light';
   };
 
@@ -37,7 +36,7 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
     <PaperBackground theme={getActiveTheme()}>
       <ChapterProgress
         currentChapter={currentChapter}
-        totalChapters={5}
+        totalChapters={4}
         maxUnlockedChapter={maxUnlockedChapter}
         onChapterSelect={(ch) => setCurrentChapter(ch)}
       />
@@ -84,25 +83,6 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
 
           {currentChapter === 2 && (
             <motion.div
-              key="chapter-secrets"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="w-full flex-1 flex flex-col justify-center"
-            >
-              <SecretsChapter
-                chapterTag={config.chapter2.chapterTag}
-                title={config.chapter2.title}
-                instruction={config.chapter2.instruction}
-                easterEggs={config.chapter2.easterEggs}
-                onComplete={() => goToChapter(3)}
-              />
-            </motion.div>
-          )}
-
-          {currentChapter === 3 && (
-            <motion.div
               key="chapter-minecraft"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -117,12 +97,12 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
                 blockInstruction={config.chapter3.blockInstruction}
                 pixelBadge={config.chapter3.pixelBadge}
                 messages={config.chapter3.messages}
-                onComplete={() => goToChapter(4)}
+                onComplete={() => goToChapter(3)}
               />
             </motion.div>
           )}
 
-          {currentChapter === 4 && (
+          {currentChapter === 3 && (
             <motion.div
               key="chapter-bouquet"
               initial={{ opacity: 0, scale: 0.95 }}

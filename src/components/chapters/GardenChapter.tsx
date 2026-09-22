@@ -25,7 +25,6 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
   flowers,
   onComplete,
 }) => {
-  // Set of flower IDs whose clusters of 3 have bloomed
   const [bloomedClusters, setBloomedClusters] = useState<string[]>([]);
   const [activeNote, setActiveNote] = useState<FlowerItem | null>(null);
 
@@ -37,7 +36,6 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
       sounds.vibrate(25);
       sounds.playBloom(index);
 
-      // Mini golden sparkle
       try {
         confetti({
           particleCount: 20,
@@ -95,7 +93,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
         </motion.p>
       </div>
 
-      {/* Flower Field - 6 clusters of 3 blooming together */}
+      {/* Flower Field - 6 clusters of 3 */}
       <div className="relative mx-auto my-auto w-full max-w-sm py-2">
         <div className="grid grid-cols-3 gap-y-6 gap-x-2 sm:gap-x-4 place-items-center">
           {flowers.map((flower, idx) => {
@@ -109,9 +107,8 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
                 className="relative flex flex-col items-center group cursor-pointer active:scale-95 transition-transform"
                 onClick={() => handleFlowerTouch(flower, idx)}
               >
-                {/* Visual flower cluster container */}
                 <div className="relative flex items-end justify-center min-h-[95px]">
-                  {/* Left companion flower (sprouts when tapped) */}
+                  {/* Left companion flower */}
                   <AnimatePresence>
                     {isClustered && (
                       <motion.div
@@ -133,7 +130,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
                     )}
                   </AnimatePresence>
 
-                  {/* Right companion flower (sprouts when tapped) */}
+                  {/* Right companion flower */}
                   <AnimatePresence>
                     {isClustered && (
                       <motion.div
@@ -155,7 +152,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
                     )}
                   </AnimatePresence>
 
-                  {/* Main Central Flower - ALWAYS OPEN */}
+                  {/* Main Central Flower */}
                   <div className="relative z-10">
                     <FlowerSVG
                       type={flower.type}
@@ -170,7 +167,6 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
                   </div>
                 </div>
 
-                {/* Status tag */}
                 <span
                   className={`mt-1 font-handwriting text-xs sm:text-sm text-center leading-tight transition-colors ${
                     isClustered ? 'text-amber-950 font-medium' : 'text-amber-800/60'
@@ -184,7 +180,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
         </div>
       </div>
 
-      {/* Note modal when a flower is touched */}
+      {/* Note modal */}
       <AnimatePresence>
         {activeNote && (
           <motion.div
@@ -237,7 +233,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Button to proceed to Chapter 2 */}
+      {/* Button to proceed to Minecraft Chapter */}
       <div className="mx-auto w-full max-w-sm flex justify-center min-h-[52px] items-center">
         <AnimatePresence>
           {isAllClustered && (
@@ -253,7 +249,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
               }}
               className="group flex items-center gap-2.5 rounded-full bg-amber-800 px-6 py-3 font-serif text-sm font-medium text-amber-50 shadow-md transition-all hover:bg-amber-900 active:scale-95"
             >
-              <span>Explorar los secretos</span>
+              <span>El siguiente mundo</span>
               <ArrowRight
                 size={16}
                 className="transition-transform group-hover:translate-x-1 text-amber-300"
