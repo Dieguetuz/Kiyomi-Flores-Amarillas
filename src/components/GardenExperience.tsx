@@ -18,7 +18,6 @@ interface GardenExperienceProps {
 export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) => {
   const [currentChapter, setCurrentChapter] = useState(0);
   const [maxUnlockedChapter, setMaxUnlockedChapter] = useState(0);
-  const [customTheme, setCustomTheme] = useState<'light' | 'mikey'>('light');
 
   const goToChapter = (chapterIndex: number) => {
     setCurrentChapter(chapterIndex);
@@ -29,7 +28,6 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
 
   const getActiveTheme = () => {
     if (currentChapter === 0) return 'dark';
-    if (customTheme === 'mikey') return 'mikey';
     if (currentChapter === 3) return 'minecraft';
     if (currentChapter === 4) return 'bouquet';
     return 'light';
@@ -98,7 +96,6 @@ export const GardenExperience: React.FC<GardenExperienceProps> = ({ config }) =>
                 title={config.chapter2.title}
                 instruction={config.chapter2.instruction}
                 easterEggs={config.chapter2.easterEggs}
-                onThemeChange={(th) => setCustomTheme(th)}
                 onComplete={() => goToChapter(3)}
               />
             </motion.div>

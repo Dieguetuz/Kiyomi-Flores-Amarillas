@@ -25,24 +25,35 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
   flowers,
   onComplete,
 }) => {
-  const [openedFlowers, setOpenedFlowers] = useState<string[]>([]);
+  // Set of flower IDs whose clusters of 3 have bloomed
+  const [bloomedClusters, setBloomedClusters] = useState<string[]>([]);
   const [activeNote, setActiveNote] = useState<FlowerItem | null>(null);
 
   const handleFlowerTouch = (flower: FlowerItem, index: number) => {
-    const isAlreadyOpen = openedFlowers.includes(flower.id);
-    if (!isAlreadyOpen) {
-      const nextOpened = [...openedFlowers, flower.id];
-      setOpenedFlowers(nextOpened);
+    const isAlreadyClustered = bloomedClusters.includes(flower.id);
+    if (!isAlreadyClustered) {
+      const nextBloomed = [...bloomedClusters, flower.id];
+      setBloomedClusters(nextBloomed);
       sounds.vibrate(25);
       sounds.playBloom(index);
 
-      if (nextOpened.length === flowers.length) {
+      // Mini golden sparkle
+      try {
+        confetti({
+          particleCount: 20,
+          spread: 45,
+          origin: { y: 0.65 },
+          colors: ['#FBBF24', '#F59E0B', '#FEF08A'],
+        });
+      } catch {}
+
+      if (nextBloomed.length === flowers.length) {
         sounds.playSecretFound();
         try {
           confetti({
-            particleCount: 40,
-            spread: 60,
-            origin: { y: 0.65 },
+            particleCount: 45,
+            spread: 70,
+            origin: { y: 0.5 },
             colors: ['#FBBF24', '#F59E0B', '#FEF08A', '#84936B'],
           });
         } catch {}
@@ -53,7 +64,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
     setActiveNote(flower);
   };
 
-  const isAllOpened = openedFlowers.length === flowers.length;
+  const isAllClustered = bloomedClusters.length === flowers.length;
 
   return (
     <div className="relative flex min-h-[100dvh] w-full flex-col justify-between px-3 sm:px-6 pt-12 pb-6 select-none">
@@ -78,60 +89,94 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
           animate={{ opacity: 1 }}
           className="font-handwriting text-base sm:text-lg text-amber-800/85"
         >
-          {!isAllOpened
-            ? `${instruction} (${openedFlowers.length}/${flowers.length})`
+          {!isAllClustered
+            ? `Toca cada flor para que crezca acompañada (${bloomedClusters.length}/${flowers.length})`
             : completedPrompt}
         </motion.p>
       </div>
 
-      {/* Flower Field - Perfectly tuned for mobile touch ergonomics */}
-      <div className="relative mx-auto my-auto w-full max-w-sm py-3">
-        <div className="grid grid-cols-3 gap-y-5 gap-x-1 sm:gap-x-3 place-items-center">
+      {/* Flower Field - 6 clusters of 3 blooming together */}
+      <div className="relative mx-auto my-auto w-full max-w-sm py-2">
+        <div className="grid grid-cols-3 gap-y-6 gap-x-2 sm:gap-x-4 place-items-center">
           {flowers.map((flower, idx) => {
-            const isOpened = openedFlowers.includes(flower.id);
+            const isClustered = bloomedClusters.includes(flower.id);
             return (
               <motion.div
                 key={flower.id}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.06, duration: 0.4 }}
+                transition={{ delay: idx * 0.05, duration: 0.35 }}
                 className="relative flex flex-col items-center group cursor-pointer active:scale-95 transition-transform"
                 onClick={() => handleFlowerTouch(flower, idx)}
               >
-                {/* Number Badge when closed */}
-                {!isOpened && (
-                  <motion.div
-                    animate={{ y: [0, -3, 0] }}
-                    transition={{ repeat: Infinity, duration: 2, delay: idx * 0.2 }}
-                    className="absolute -top-2 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-900 text-[11px] font-handwriting shadow-sm border border-amber-300"
-                  >
-                    {idx + 1}
-                  </motion.div>
-                )}
+                {/* Visual flower cluster container */}
+                <div className="relative flex items-end justify-center min-h-[95px]">
+                  {/* Left companion flower (sprouts when tapped) */}
+                  <AnimatePresence>
+                    {isClustered && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0, x: 0, y: 10 }}
+                        animate={{ scale: 0.72, opacity: 1, x: -18, y: 2 }}
+                        transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+                        className="absolute bottom-0 z-0 origin-bottom-right rotate-[-15deg] pointer-events-none"
+                      >
+                        <FlowerSVG
+                          type={flower.type === 'sunflower' ? 'daisy' : 'wildflower'}
+                          isOpen={true}
+                          petalColor="#FDE047"
+                          centerColor="#B45309"
+                          stemHeight={flower.stemHeight * 0.75}
+                          scale={0.8}
+                          rotation={-10}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                <div
-                  className={`transition-all duration-200 ${
-                    isOpened ? 'scale-100' : 'scale-90 hover:scale-95'
-                  }`}
-                >
-                  <FlowerSVG
-                    type={flower.type}
-                    isOpen={isOpened}
-                    petalColor={flower.petalColor}
-                    centerColor={flower.centerColor}
-                    stemHeight={78}
-                    scale={0.96}
-                    rotation={flower.rotation}
-                    showPollen={isOpened}
-                  />
+                  {/* Right companion flower (sprouts when tapped) */}
+                  <AnimatePresence>
+                    {isClustered && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0, x: 0, y: 10 }}
+                        animate={{ scale: 0.76, opacity: 1, x: 18, y: 4 }}
+                        transition={{ type: 'spring', stiffness: 320, damping: 18, delay: 0.05 }}
+                        className="absolute bottom-0 z-0 origin-bottom-left rotate-[15deg] pointer-events-none"
+                      >
+                        <FlowerSVG
+                          type={flower.type === 'tulip' ? 'wildflower' : 'daisy'}
+                          isOpen={true}
+                          petalColor="#FEF08A"
+                          centerColor="#78350F"
+                          stemHeight={flower.stemHeight * 0.78}
+                          scale={0.82}
+                          rotation={10}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Main Central Flower - ALWAYS OPEN */}
+                  <div className="relative z-10">
+                    <FlowerSVG
+                      type={flower.type}
+                      isOpen={true}
+                      petalColor={flower.petalColor}
+                      centerColor={flower.centerColor}
+                      stemHeight={72}
+                      scale={isClustered ? 1 : 0.95}
+                      rotation={flower.rotation}
+                      showPollen={isClustered}
+                    />
+                  </div>
                 </div>
 
+                {/* Status tag */}
                 <span
-                  className={`mt-0.5 font-handwriting text-xs sm:text-sm text-center leading-tight transition-colors ${
-                    isOpened ? 'text-amber-950 font-medium' : 'text-amber-800/50'
+                  className={`mt-1 font-handwriting text-xs sm:text-sm text-center leading-tight transition-colors ${
+                    isClustered ? 'text-amber-950 font-medium' : 'text-amber-800/60'
                   }`}
                 >
-                  {isOpened ? flower.shortLabel : 'tocar'}
+                  {isClustered ? `💛 ${flower.shortLabel}` : flower.shortLabel}
                 </span>
               </motion.div>
             );
@@ -195,7 +240,7 @@ export const GardenChapter: React.FC<GardenChapterProps> = ({
       {/* Button to proceed to Chapter 2 */}
       <div className="mx-auto w-full max-w-sm flex justify-center min-h-[52px] items-center">
         <AnimatePresence>
-          {isAllOpened && (
+          {isAllClustered && (
             <motion.button
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

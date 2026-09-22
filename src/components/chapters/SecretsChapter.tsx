@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EasterEggItem } from '@/types';
 import { sounds } from '@/utils/sound';
-import { ArrowRight, BookOpen, PawPrint, X } from 'lucide-react';
+import { ArrowRight, BookOpen, PawPrint, X, Sparkles } from 'lucide-react';
 import Image from 'next/image';
+import confetti from 'canvas-confetti';
 
 interface SecretsChapterProps {
   chapterTag: string;
@@ -13,7 +14,7 @@ interface SecretsChapterProps {
   instruction: string;
   easterEggs: EasterEggItem[];
   onComplete: () => void;
-  onThemeChange: (theme: 'light' | 'mikey') => void;
+  onThemeChange?: (theme: 'light' | 'mikey') => void;
 }
 
 export const SecretsChapter: React.FC<SecretsChapterProps> = ({
@@ -22,20 +23,11 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
   instruction,
   easterEggs,
   onComplete,
-  onThemeChange,
 }) => {
   const [foundEggs, setFoundEggs] = useState<string[]>([]);
   const [activeEgg, setActiveEgg] = useState<EasterEggItem | null>(null);
   const [catRunning, setCatRunning] = useState(false);
-  const [lunetaPeeking, setLunetaPeeking] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLunetaPeeking(true);
-      setTimeout(() => setLunetaPeeking(false), 3200);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
+  const [extraFlowersBurst, setExtraFlowersBurst] = useState(false);
 
   const handleEggClick = (egg: EasterEggItem) => {
     const isNew = !foundEggs.includes(egg.id);
@@ -46,10 +38,17 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
     }
 
     if (egg.id === 'mikey') {
-      onThemeChange('mikey');
-      setTimeout(() => {
-        onThemeChange('light');
-      }, 4000);
+      // Mikey bonus: instead of dark mode, spawn extra blooming flowers & golden confetti!
+      setExtraFlowersBurst(true);
+      try {
+        confetti({
+          particleCount: 50,
+          spread: 75,
+          origin: { y: 0.5 },
+          colors: ['#FACC15', '#F59E0B', '#FEF08A', '#D97706'],
+        });
+      } catch {}
+      setTimeout(() => setExtraFlowersBurst(false), 5000);
     } else if (egg.id === 'tigger') {
       setCatRunning(true);
       setTimeout(() => setCatRunning(false), 1800);
@@ -62,6 +61,7 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
 
   return (
     <div className="relative flex min-h-[100dvh] w-full flex-col justify-between px-3 sm:px-6 pt-12 pb-6 select-none">
+      {/* Cat scampering across */}
       <AnimatePresence>
         {catRunning && (
           <motion.div
@@ -79,6 +79,40 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
               *zoomies*
             </span>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating extra yellow flowers when Mikey secret is active */}
+      <AnimatePresence>
+        {extraFlowersBurst && (
+          <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <motion.div
+                key={`mikey-flower-${i}`}
+                initial={{
+                  x: `${(i * 7) % 95}vw`,
+                  y: '105vh',
+                  opacity: 0,
+                  scale: 0.6,
+                  rotate: 0,
+                }}
+                animate={{
+                  y: '-10vh',
+                  opacity: [0, 1, 1, 0],
+                  scale: [0.6, 1.2, 0.8],
+                  rotate: 360,
+                }}
+                transition={{
+                  duration: 3 + (i % 3),
+                  delay: i * 0.15,
+                  ease: 'easeOut',
+                }}
+                className="absolute text-3xl select-none"
+              >
+                {i % 2 === 0 ? '🌻' : '🌼'}
+              </motion.div>
+            ))}
+          </div>
         )}
       </AnimatePresence>
 
@@ -112,119 +146,114 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
         </div>
       </div>
 
-      {/* Interactive Scenery */}
-      <div className="relative mx-auto my-auto w-full max-w-sm h-[360px] rounded-3xl bg-amber-900/[0.03] border border-amber-900/10 p-5 overflow-hidden">
-        {/* Decorative background flowers */}
-        <div className="absolute inset-0 pointer-events-none opacity-40">
-          <div className="absolute -bottom-4 left-3 text-3xl rotate-[-8deg]">🌼</div>
-          <div className="absolute -bottom-4 left-28 text-3xl rotate-[5deg]">🌻</div>
-          <div className="absolute -bottom-6 right-8 text-3xl rotate-[-4deg]">🌼</div>
-          <div className="absolute -bottom-4 right-28 text-2xl rotate-[12deg]">🌻</div>
-        </div>
+      {/* Illustrated Storybook Garden Window */}
+      <div className="relative mx-auto my-auto w-full max-w-sm h-[390px] rounded-3xl overflow-hidden border-2 border-amber-800/25 shadow-xl bg-[#EDE4CF]">
+        {/* Storybook illustration backdrop */}
+        <Image
+          src="/images/secret_garden.jpg"
+          alt="Jardín de secretos ilustrado"
+          fill
+          className="object-cover"
+          priority
+        />
 
-        {/* Secret 1: MIKEY */}
+        {/* Soft vignette overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-amber-950/40 via-transparent to-amber-950/20 pointer-events-none" />
+
+        {/* Secret 1: MIKEY (Moto silueta dorada por el camino) */}
         {easterEggs.find((e) => e.id === 'mikey') && (
           <div
-            className="absolute right-6 top-12 group cursor-pointer active:scale-90 transition-transform"
+            className="absolute right-8 top-16 group cursor-pointer active:scale-90 transition-transform z-20"
             onClick={() => handleEggClick(easterEggs.find((e) => e.id === 'mikey')!)}
           >
-            <div className="relative p-2.5 rounded-full bg-amber-950/10 hover:bg-amber-950/20 transition-colors">
-              <svg width="32" height="22" viewBox="0 0 34 24" fill="none" className="text-amber-900/75">
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ repeat: Infinity, duration: 2.4 }}
+              className="relative p-2.5 rounded-full bg-amber-950/40 backdrop-blur-sm border border-amber-300/60 shadow-md"
+            >
+              <svg width="30" height="20" viewBox="0 0 34 24" fill="none" className="text-yellow-200">
                 <circle cx="7" cy="17" r="5" stroke="currentColor" strokeWidth="2" />
                 <circle cx="27" cy="17" r="5" stroke="currentColor" strokeWidth="2" />
                 <path d="M 7 17 L 15 17 L 20 8 L 27 17" stroke="currentColor" strokeWidth="2" />
-                <path d="M 12 11 L 18 11" stroke="#D97706" strokeWidth="2.5" />
+                <path d="M 12 11 L 18 11" stroke="#FDE047" strokeWidth="2.5" />
                 <path d="M 19 8 L 18 5 L 22 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              <motion.span
-                animate={{ opacity: [0.3, 1, 0.3] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="absolute top-1 right-1 h-2 w-2 rounded-full bg-amber-400 blur-[0.5px]"
-              />
-            </div>
+              <span className="absolute -top-1 -right-1 text-xs">✨</span>
+            </motion.div>
           </div>
         )}
 
-        {/* Secret 2: TIGGER */}
+        {/* Secret 2: TIGGER (Huellita cerca de los girasoles) */}
         {easterEggs.find((e) => e.id === 'tigger') && (
           <div
-            className="absolute left-6 bottom-14 group cursor-pointer active:scale-90 transition-transform"
+            className="absolute left-7 bottom-20 group cursor-pointer active:scale-90 transition-transform z-20"
             onClick={() => handleEggClick(easterEggs.find((e) => e.id === 'tigger')!)}
           >
-            <div className="p-2.5 rounded-full bg-amber-800/10 hover:bg-amber-800/20 transition-colors">
-              <PawPrint size={22} className="text-amber-800/70 rotate-[-20deg]" />
-              <motion.span
-                animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-orange-400"
-              />
-            </div>
+            <motion.div
+              animate={{ scale: [1, 1.12, 1] }}
+              transition={{ repeat: Infinity, duration: 2.1, delay: 0.3 }}
+              className="p-2.5 rounded-full bg-amber-900/40 backdrop-blur-sm border border-amber-300/60 shadow-md"
+            >
+              <PawPrint size={22} className="text-amber-200 rotate-[-15deg]" />
+              <span className="absolute -top-1 -right-1 text-xs">🐾</span>
+            </motion.div>
           </div>
         )}
 
-        {/* Secret 3: LUNETA */}
+        {/* Secret 3: LUNETA DE YOGURT (Asomándose entre las flores de la casa) */}
         {easterEggs.find((e) => e.id === 'luneta') && (
           <div
-            className="absolute right-10 bottom-16 group cursor-pointer active:scale-90 transition-transform"
+            className="absolute right-12 bottom-24 group cursor-pointer active:scale-90 transition-transform z-20"
             onClick={() => handleEggClick(easterEggs.find((e) => e.id === 'luneta')!)}
           >
             <motion.div
-              animate={{
-                y: lunetaPeeking ? 0 : 24,
-                opacity: lunetaPeeking ? 1 : 0.35,
-              }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
-              className="relative p-2 rounded-xl bg-amber-900/10"
+              animate={{ y: [0, -3, 0] }}
+              transition={{ repeat: Infinity, duration: 1.8 }}
+              className="p-2 rounded-2xl bg-amber-950/40 backdrop-blur-sm border border-amber-300/60 shadow-md flex flex-col items-center"
             >
-              <div className="flex flex-col items-center">
-                <div className="flex gap-1.5">
-                  <div className="h-3 w-3 bg-amber-800/80 clip-triangle rotate-[-15deg] rounded-sm" />
-                  <div className="h-3 w-3 bg-amber-800/80 clip-triangle rotate-[15deg] rounded-sm" />
-                </div>
-                <div className="h-3.5 w-6 rounded-t-full bg-amber-800/80 flex items-center justify-center gap-1">
-                  <div className="h-1 w-1 rounded-full bg-amber-100" />
-                  <div className="h-1 w-1 rounded-full bg-amber-100" />
-                </div>
+              <div className="flex gap-1">
+                <div className="h-2.5 w-2.5 bg-amber-200 clip-triangle rotate-[-12deg]" />
+                <div className="h-2.5 w-2.5 bg-amber-200 clip-triangle rotate-[12deg]" />
+              </div>
+              <div className="h-3 w-5 bg-amber-200 rounded-t-full flex items-center justify-center gap-0.5">
+                <div className="h-1 w-1 bg-amber-900 rounded-full" />
+                <div className="h-1 w-1 bg-amber-900 rounded-full" />
               </div>
             </motion.div>
           </div>
         )}
 
-        {/* Secret 4: DARK ROMANCE */}
+        {/* Secret 4: DARK ROMANCE (Libro entre los arbustos) */}
         {easterEggs.find((e) => e.id === 'dark-romance') && (
           <div
-            className="absolute left-8 top-16 group cursor-pointer active:scale-90 transition-transform"
+            className="absolute left-8 top-20 group cursor-pointer active:scale-90 transition-transform z-20"
             onClick={() => handleEggClick(easterEggs.find((e) => e.id === 'dark-romance')!)}
           >
-            <div className="p-2.5 rounded-xl bg-charcoal-dark/15 hover:bg-charcoal-dark/25 transition-colors">
+            <div className="p-2.5 rounded-xl bg-amber-950/45 backdrop-blur-sm border border-amber-300/50 shadow-md">
               <div className="relative">
-                <BookOpen size={20} className="text-[#26201B]" />
-                <span className="absolute -top-1 -right-1 text-[9px]">🖤</span>
+                <BookOpen size={20} className="text-amber-100" />
+                <span className="absolute -top-1.5 -right-1.5 text-[10px]">🖤</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* Secret 5: CHOCOLATE */}
+        {/* Secret 5: CHOCOLATE (Junto al camino) */}
         {easterEggs.find((e) => e.id === 'chocolate') && (
           <div
-            className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 group cursor-pointer active:scale-90 transition-transform"
+            className="absolute left-1/2 -translate-x-1/2 bottom-8 group cursor-pointer active:scale-90 transition-transform z-20"
             onClick={() => handleEggClick(easterEggs.find((e) => e.id === 'chocolate')!)}
           >
-            <div className="relative p-2.5 rounded-full bg-amber-950/10 hover:bg-amber-950/20 transition-colors">
-              <span className="text-2xl filter drop-shadow-sm">🍫</span>
-              <motion.span
-                animate={{ opacity: [0.2, 0.9, 0.2] }}
-                transition={{ repeat: Infinity, duration: 1.8 }}
-                className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-yellow-300"
-              />
+            <div className="p-2.5 rounded-full bg-amber-950/45 backdrop-blur-sm border border-amber-300/50 shadow-md">
+              <span className="text-2xl filter drop-shadow">🍫</span>
             </div>
           </div>
         )}
 
-        <div className="absolute bottom-2.5 left-0 right-0 text-center pointer-events-none">
-          <span className="font-handwriting text-xs text-amber-900/50">
-            Toca las pequeñas sombras y destellos escondidos ✨
+        {/* Bottom invitation text */}
+        <div className="absolute bottom-2 left-0 right-0 text-center pointer-events-none z-10">
+          <span className="font-handwriting text-xs text-amber-100 bg-amber-950/60 px-3 py-0.5 rounded-full backdrop-blur-[2px]">
+            Toca las pequeñas sombras y destellos en el jardín ✨
           </span>
         </div>
       </div>
@@ -246,13 +275,7 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
               exit={{ scale: 0.92, y: 10, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 340 }}
               onClick={(e) => e.stopPropagation()}
-              className={`relative w-full max-w-xs sm:max-w-sm rounded-2xl p-6 text-center border shadow-2xl ${
-                activeEgg.id === 'mikey'
-                  ? 'bg-[#12100D] border-amber-500/40 text-amber-100'
-                  : activeEgg.id === 'dark-romance'
-                  ? 'bg-[#181512] border-neutral-700/60 text-stone-200'
-                  : 'bg-[#FCF8EE] border-[#E9DFC8] text-charcoal'
-              }`}
+              className="relative w-full max-w-xs sm:max-w-sm rounded-2xl p-6 text-center border shadow-2xl bg-[#FCF8EE] border-[#E9DFC8] text-charcoal"
             >
               <button
                 onClick={() => setActiveEgg(null)}
@@ -262,15 +285,7 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
                 <X size={18} />
               </button>
 
-              <span
-                className={`inline-block font-serif text-[10px] font-semibold uppercase tracking-wider px-3 py-0.5 rounded-full mb-3 ${
-                  activeEgg.id === 'mikey'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                    : activeEgg.id === 'dark-romance'
-                    ? 'bg-neutral-800 text-stone-300 border border-neutral-700'
-                    : 'bg-amber-100 text-amber-900'
-                }`}
-              >
+              <span className="inline-block font-serif text-[10px] font-semibold uppercase tracking-wider px-3 py-0.5 rounded-full mb-3 bg-amber-100 text-amber-900 border border-amber-200">
                 {activeEgg.badge}
               </span>
 
@@ -289,14 +304,23 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
                 </div>
               )}
 
+              {/* Mikey Header Decoration */}
+              {activeEgg.id === 'mikey' && (
+                <div className="mb-2 flex items-center justify-center gap-1.5 text-amber-600">
+                  <Sparkles size={18} />
+                  <span className="text-xl">🏍️</span>
+                  <Sparkles size={18} />
+                </div>
+              )}
+
               <div className="space-y-2">
                 {activeEgg.messages.map((msg, i) => (
                   <p
                     key={i}
                     className={`font-handwriting leading-snug ${
                       i === 0
-                        ? 'text-2xl sm:text-3xl font-medium'
-                        : 'text-lg sm:text-xl opacity-90'
+                        ? 'text-2xl sm:text-3xl font-medium text-amber-950'
+                        : 'text-lg sm:text-xl opacity-90 text-amber-900'
                     }`}
                   >
                     {msg}
@@ -306,13 +330,7 @@ export const SecretsChapter: React.FC<SecretsChapterProps> = ({
 
               <button
                 onClick={() => setActiveEgg(null)}
-                className={`mt-5 inline-flex items-center gap-1.5 rounded-full px-5 py-2 font-serif text-xs font-medium transition-colors active:scale-95 ${
-                  activeEgg.id === 'mikey'
-                    ? 'bg-amber-500 text-black hover:bg-amber-400'
-                    : activeEgg.id === 'dark-romance'
-                    ? 'bg-stone-700 text-stone-100 hover:bg-stone-600'
-                    : 'bg-amber-800 text-amber-50 hover:bg-amber-900'
-                }`}
+                className="mt-5 inline-flex items-center gap-1.5 rounded-full px-5 py-2 font-serif text-xs font-medium transition-colors bg-amber-800 text-amber-50 hover:bg-amber-900 active:scale-95 shadow-sm"
               >
                 Continuar explorando
               </button>

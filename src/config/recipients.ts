@@ -14,8 +14,8 @@ export const RECIPIENTS: Record<string, RecipientConfig> = {
     chapter1: {
       chapterTag: 'Capítulo I',
       title: 'Una flor por cada pequeña cosa',
-      instruction: 'Toca las flores cerradas para hacerlas florecer.',
-      completedPrompt: 'El jardín ha comenzado a despertar...',
+      instruction: 'Toca las flores para hacerlas florecer.',
+      completedPrompt: 'Cada pequeña flor ahora tiene compañía...',
       flowers: [
         {
           id: 'flower-1',
@@ -112,11 +112,11 @@ export const RECIPIENTS: Record<string, RecipientConfig> = {
       easterEggs: [
         {
           id: 'mikey',
-          title: 'Modo Mikey Activado',
-          badge: 'MODO MIKEY ACTIVADO 🏍️⚡',
+          title: 'Cuéntame todo de Mikey',
+          badge: 'TEORÍAS & FANDOM 🏍️✨',
           hint: 'Un destello dorado sobre dos ruedas...',
           messages: [
-            'MODO MIKEY ACTIVADO',
+            'Cuéntame todo de Mikey 💛',
             'Bonus especial para mi experta personal en Mikey.',
             'Todavía me debes todas esas teorías del fandom 👀',
             'Prometo intentar no perderme cuando me expliques todo jsjs.',
